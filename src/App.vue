@@ -1,28 +1,51 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <TopBar />
+    <div class="main-block">
+    <InventoryBar  />
+      <div class="main-block__list">
+        <ListsBar/>
+      </div>
+      <ShopBar  />
+    </div>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TopBar from "@/components/TopBar";
+import InventoryBar from "@/components/InventoryBar";
+import ListsBar from "@/components/ListsBar";
+import ShopBar from "@/components/ShopBar";
+
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
+  components:{
+      TopBar,
+      InventoryBar,
+      ListsBar,
+      ShopBar,
 
+  }
+};
+</script>
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.main-block{
+  display: flex;
+  justify-content: space-between;
 }
+.main-block__list{
+display: flex;
+justify-content: space-between;
+width: 100%;
+}
+
+*{
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
 </style>

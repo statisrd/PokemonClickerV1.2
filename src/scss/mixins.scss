@@ -1,0 +1,30 @@
+@mixin yellow-blue-style{
+    font-family: Inter;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 29.05px;
+    text-align: left;
+    color: var(--Primary, #FFCC01);
+}
+
+
+.money-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .money-display__coin {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .money-display__quantity {
+    font-family: Inter;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 29.05px;
+    text-align: left;
+    color: var(--Primary, #FFCC01);
+  }
+  
