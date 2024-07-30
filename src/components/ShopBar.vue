@@ -43,6 +43,7 @@ export default {
 </script>
 
 <style scoped>
+
 .shop-item {
   display: flex;
   flex-direction: column;

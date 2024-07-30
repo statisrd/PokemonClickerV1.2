@@ -60,7 +60,7 @@ export default {
       growthRate: 15,
       gardenOptions: {
           group: 'pokemon',
-          draggable: '.colsInventory'
+          draggable: '.cell'
         },
         storeItems: [
         {
