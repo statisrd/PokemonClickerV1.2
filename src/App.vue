@@ -26,6 +26,11 @@ export default {
       ListsBar,
       ShopBar,
 
+  },
+
+  created(){
+    // this.$store.dispatch('dropLocal');
+
   }
 };
 </script>

@@ -25,6 +25,8 @@ import PokemonBlock from '@/components/element/PokemonsBlock.vue';
 import GardenBlock from '@/components/element/GardenBlock.vue';
 import HuntBlock from '@/components/element/HuntBlock.vue';
 
+import { mapActions, mapGetters } from 'vuex';
+
 export default {
   components: {
     PokemonBlock,
@@ -38,14 +40,31 @@ export default {
         { id: 0, name: 'My pokemon', elementName: 'PokemonBlock' },
         { id: 1, name: 'Garden', elementName: 'GardenBlock' },
         { id: 2, name: 'Hunt', elementName: 'HuntBlock' }
-      ]
+      ],
+      crutch: [],
     };
   },
   methods: {
+    ...mapActions(['addNewPokemon']),
+
+
     toggleComponent(id) {
       if (this.activeComponent !== id) {
         this.activeComponent = id;
       }
+    }
+  },
+
+  computed: {
+    ...mapGetters(['getPlayerPokemon']),
+  },
+
+  async created(){
+    this.crutch = await this.getPlayerPokemon;
+    if(this.crutch.length === 0){
+    await this.addNewPokemon( {id: 6});
+    await this.addNewPokemon( {id: 84});
+    await this.addNewPokemon( {id: 16});
     }
   }
 };

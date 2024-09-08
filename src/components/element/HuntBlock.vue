@@ -15,7 +15,7 @@ export default {
     };
   },
   methods: {
-    async fetchPokemon() {
+    async fetchItem() {
       const pokemonIds = [1, 2, 3, 4, 5, 6, 7]; // Можно указать больше ID покемонов
       const requests = pokemonIds.map(id => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(response => response.json()));
       const pokemons = await Promise.all(requests);
@@ -36,7 +36,7 @@ export default {
     }
   },
   mounted() {
-    this.fetchPokemon();
+    this.fetchItem();
   }
 };
 </script>

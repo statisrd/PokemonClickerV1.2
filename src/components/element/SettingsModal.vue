@@ -17,28 +17,28 @@
                         {{ alertMessage }}
                     </v-alert>
                     <div class="food-item" v-for="item in foodItems" :key="item.id">
-                        <img :src="item.image" :alt="item.title" class="food-item__image">
+                        <img :src="item.pokemon.sprites.default" :alt="item.name" class="food-item__image">
                         <div class="food-item__details">
-                            <h3 class="food-item__title">{{ item.title }}</h3>
-                            <div class="food-item__description">{{ item.description }}</div>
-                            <button class="food-item__button" @click="feedPokemon()">Накормить</button>
+                            <h3 class="food-item__title">{{ item.pokemon.name }}</h3>
+                            <div class="food-item__description">{{ item.pokemon.info }}</div>
+                            <button class="food-item__button" @click="feedPokemon(item)">Накормить</button>
                         </div>
                     </div>
                 </div>
                 <div v-if="activeTab === 'stats'" class="tab-content">
                     <div class="pokemon-details">
-                        <img :src="pokemon.sprites.front_default" :alt="pokemon.name" class="pokemon-details__image">
+                        <img :src="pokemon.playerPokemon.sprites.front_default" :alt="pokemon.name" class="pokemon-details__image">
                         <button class="delete-button">Удалить покемона</button>
                     </div>
                     <div class="pokemon-details__info">
                         <div class="pokemon-details__info-block"><strong>Вид</strong><v-spacer></v-spacer> {{ pokemon.name }}</div>
-                        <div class="pokemon-details__info-block"><strong>Вес</strong><v-spacer></v-spacer> {{ pokemon.weight }} кг</div>
+                        <div class="pokemon-details__info-block"><strong>Вес</strong><v-spacer></v-spacer> {{ pokemon.playerPokemon.weight }} кг</div>
                         <div class="pokemon-details__info-block"><strong>Суммарно заработано</strong><v-spacer></v-spacer> 11 200</div>
-                        <div class="pokemon-details__info-block"><strong>Денег/сек</strong><v-spacer></v-spacer> 1.1</div>
-                        <div class="pokemon-details__info-block"><strong>Возраст</strong><v-spacer></v-spacer>1 день</div>
+                        <div class="pokemon-details__info-block"><strong>Денег/сек</strong><v-spacer></v-spacer> {{ pokemon.mps }}</div>
+                        <div class="pokemon-details__info-block"><strong>Возраст</strong><v-spacer></v-spacer>{{ pokemonAge }}</div>
                         <div class="pokemon-actions">
                             <input class="pokemonNickname" type="text" placeholder="Псевдоним покемона" v-model="pokemonNickname">
-                            <button class="save-button" @click="saveNickname">Сохранить</button>
+                            <button class="save-button" @click="saveNickname()">Сохранить</button>
                         </div>
                     </div>
                 </div>
@@ -51,6 +51,9 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex';
+
+
 export default {
     props: {
         pokemon: Object
@@ -58,58 +61,79 @@ export default {
     data() {
         return {
             activeTab: 'feed',
-            pokemonNickname: this.pokemon.nickname || '',
-            foodItems: [
-                {
-                    id: 1,
-                    image: require('@/assets/Berry.svg'), 
-                    title: 'Ягода 1 уровня',
-                    description: 'Накорми ей покемона для увеличения веса на 0.1 кг'
-                },
-                {
-                    id: 2,
-                    image: require('@/assets/Berry.svg'), 
-                    title: 'Ягода 2 уровня',
-                    description: 'Накорми ей покемона для увеличения веса на 0.1 кг'
-                },
-                {
-                    id: 3,
-                    image: require('@/assets/Berry.svg'), 
-                    title: 'Ягода 3 уровня точно такая же как и "Ягода 1 уровня"',
-                    description: 'Накорми ей покемона для увеличения веса на 0.1 кг'
-                }
-            ],
+            pokemonNickname: '',
+            foodItems: [],
             showAlert: false,
             alertMessage: ''
         };
     },
-    watch: {
-        pokemon: {
-            immediate: true,
-            handler(newVal) {
-                this.pokemonNickname = newVal.nickname || '';
-            }
-        },
-    },
     methods: {
         ////разберись V
+        ...mapActions(['renamePokemon', 'removePokemonFromGrid']),
+
         saveNickname() {
-        if (this.pokemonNickname.trim() === '') {
-            this.pokemonNickname = this.pokemon.name;
-        }
-        this.$emit('update-nickname', this.pokemonNickname);
-    },
+            console.log(this.pokemon.id);
+            console.log(this.pokemonNickname);
+            this.renamePokemon( {id: this.pokemon.id, newName: this.pokemonNickname});
+        },
         subtractMoney(price) {
         this.$store.dispatch('subtractMoney', price);
       },
-        feedPokemon() {
+        feedPokemon(item) {
             this.alertMessage = `Ягод нет! Но деньги мы спишем`;
             this.showAlert = true;
-            this.subtractMoney(5000)
+            this.subtractMoney(10)
             setTimeout(() => {
                 this.showAlert = false;
             }, 3000); // скрыть алерт через 3 секунды
-        }
+            this.removePokemonFromGrid({ id: item.id, arrayName: 'inventory' });
+
+        },
+
+        declension(number, titles) {
+            const cases = [2, 0, 1, 1, 1, 2];
+            return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+        },
+    },
+    computed:{
+        pokemonAge() {
+            const currentTime = Date.now();
+            const ageInMilliseconds = currentTime - this.pokemon.age;
+            
+            const minutes = Math.floor((ageInMilliseconds / (1000 * 60)) % 60);
+            const hours = Math.floor((ageInMilliseconds / (1000 * 60 * 60)) % 24);
+            const days = Math.floor((ageInMilliseconds / (1000 * 60 * 60 * 24)) % 30);
+            const months = Math.floor((ageInMilliseconds / (1000 * 60 * 60 * 24 * 30)) % 12);
+            const years = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24 * 365));
+
+            let ageString = '';
+
+            if (years > 0) {
+                ageString += `${years} ${this.declension(years, ['год', 'года', 'лет'])} `;
+            }
+            if (months > 0) {
+                ageString += `${months} ${this.declension(months, ['месяц', 'месяца', 'месяцев'])} `;
+            }
+            if (days > 0) {
+                ageString += `${days} ${this.declension(days, ['день', 'дня', 'дней'])} `;
+            }
+            if (hours > 0) {
+                ageString += `${hours} ${this.declension(hours, ['час', 'часа', 'часов'])} `;
+            }
+            if (minutes > 0 || ageString === '') {
+                ageString += `${minutes} ${this.declension(minutes, ['минута', 'минуты', 'минут'])}`;
+            }
+
+            return ageString.trim();
+        },
+
+    ...mapGetters(['getPokemon']),
+
+
+    },
+    
+    created(){
+        this.foodItems = this.getPokemon;
     },
     
 };

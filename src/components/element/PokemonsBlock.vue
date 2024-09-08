@@ -1,18 +1,18 @@
 <template>
   <div class="pokemon-list">
-    <div v-for="(pokemon, index) in pokemons" :key="index" class="pokemon-card">
+    <div v-for="(playerPokemon, index) in playerPokemons" :key="index" class="pokemon-card">
       <div class="pokemon-info">
-        <h3>{{ pokemon.nickname || pokemon.name }}</h3>
-        <img style="cursor:pointer" src="@/assets/setting.svg" :alt="pokemon.name" @click="showModal(pokemon)" />
+        <h3>{{ playerPokemon.name }}</h3>
+        <img style="cursor:pointer" src="@/assets/setting.svg" :alt="playerPokemon.name" @click="showModal(playerPokemon)" />
       </div>
-      <img :src="pokemon.sprites.front_default" :alt="pokemon.name" class="pokemon-info" />
+      <img :src="playerPokemon.playerPokemon.sprites.front_default" :alt="playerPokemon.name" class="pokemon-info" />
       <div class="pokemon-info">
         <h4>Вес:</h4>
-        <div>{{ pokemon.weight }} кг</div>
+        <div>{{ playerPokemon.playerPokemon.weight }} кг</div>
       </div>
       <div class="pokemon-info">
         <h4>Денег/сек:</h4>
-        <div>1.1</div>
+        <div>{{ playerPokemon.mps }}</div>
       </div>
     </div>
 
@@ -21,7 +21,6 @@
     v-if="selectedPokemon"
     :pokemon="selectedPokemon"
     @close="hideModal"
-    @update-nickname="updatePokemonNickname" 
     />
     <!-- Разобраться как эта шляпа работает (@update-nickname="updatePokemonNickname" ) -->
   </div>
@@ -29,6 +28,7 @@
 
 <script>
 import SettingsModal from './SettingsModal.vue';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   components: {
@@ -36,34 +36,34 @@ export default {
   },
   data() {
     return {
-      pokemons: [], 
-      selectedPokemon: null 
+      playerPokemons: [], 
+      selectedPokemon: null ,
     };
   },
   methods: {
-    async fetchPokemons() {
-      const pokemonIds = [35, 42, 170, 321, 184, 286, 453, 212, 99, 69]; 
-      const requests = pokemonIds.map(id => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(res => res.json()));
-      this.pokemons = await Promise.all(requests);
-    },
-    showModal(pokemon) {
-      this.selectedPokemon = pokemon;
+    ...mapActions(['addNewPokemon','subtractMoney']),
+    showModal(playerPokemon) {
+      this.selectedPokemon = playerPokemon;
     },
     hideModal() {
       this.selectedPokemon = null;
     },
-    updatePokemonNickname(newNickname) {
-        if (this.selectedPokemon) {
-            const pokemon = this.pokemons.find(p => p.id === this.selectedPokemon.id);
-            if (pokemon) {
-                pokemon.nickname = newNickname;
-            }
-        }
-    }
   },
-  created() {
-    this.fetchPokemons(); 
-  }
+  computed: {
+    ...mapGetters(['getPlayerPokemon']),
+
+  },
+
+  async mounted() {
+    this.playerPokemons = await this.getPlayerPokemon;
+
+
+
+    this.playerPokemons = await this.getPlayerPokemon;
+    console.log("pokem",this.playerPokemon);
+
+
+  },
 };
 </script>
 
@@ -87,6 +87,7 @@ export default {
   align-items: center;
   gap: 8px;
   width: 165px;
+  height: 270px;
   padding: 12px;
   background-color: white;
   border: 1px solid #ccc;

@@ -1,7 +1,7 @@
 // store/moneyModule.js
 export default {
     state: {
-      money: parseInt(localStorage.getItem('money')) || 100000
+      money: parseInt(localStorage.getItem('money')) || 0
     },
     mutations: {
       addMoney(state, amount) {
@@ -23,7 +23,10 @@ export default {
           throw new Error('Amount must be positive');
         }
         commit('subtractMoney', amount);
-      }
+      },
+      async addMoney({ commit }, amount) {
+        commit('addMoney', amount);
+      },
     },
     getters: {
       getMoney(state) {

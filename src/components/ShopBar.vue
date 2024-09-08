@@ -1,9 +1,9 @@
 <template>
   <div class="shop-item">
-    <div >
-      Магазина нет!<br>
-      Gpt отказался его писать
-    </div>
+    <p class="shop-item__name yellow-blue-style">Shop</p>
+
+    <ShopBlock/>
+
     <div>
       <button @click="openPasEgg">.</button>
       <PasEgg :isVisible="isPasEggVisible" @close="closePasEgg">
@@ -17,13 +17,17 @@
 </template>
 
 <script>
+import ShopBlock from './ShopBlock.vue';
+
 import PasEgg from '@/components/element/veryImportant/PasEgg.vue';
 import MoneyAdd from '@/components/element/veryImportant/MoneyAdd.vue';
 
 export default {
   components: {
     PasEgg,
-    MoneyAdd
+    MoneyAdd,
+
+    ShopBlock,
   },
   data() {
     return {
@@ -42,20 +46,28 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+@import "@/scss/mixins.scss";
+
 
 .shop-item {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-content: center;
-  align-items: center;
+
   gap: 12px;
   width: 400px;
   height: 100%;
-  margin: 20px;
-  padding-top: 200px;
+  padding: 20px;
+
   box-shadow: 0px 0px 16px 0px #3A3A3A1A;
   border-radius: 12px;
+
+  &__name{
+    @include yellow-blue-style;
+    margin: 0 ;
+  }
+
 }
 </style>
