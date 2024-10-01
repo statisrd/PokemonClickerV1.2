@@ -1,17 +1,21 @@
-import Vue from 'vue' // /dist/vue.esm.js без этого vue.component не работает
-import App from './App.vue'
-import store from './store'
+import { createApp } from 'vue'; // Импортируем createApp из Vue
+import App from './App.vue';
+import vuetify from './plugins/vuetify';
+import { createPinia } from 'pinia'; // Импортируем createPinia
+import './scss/mixins.scss';
 
-import vuetify from './plugins/vuetify'
-import './scss/mixins.scss'
+// Создаем приложение Vue
+const app = createApp(App);
 
+// Настройка Pinia
+const pinia = createPinia();
+app.use(pinia); // Подключаем Pinia
 
+// Подключаем Vuetify
+app.use(vuetify);
 
-Vue.config.productionTip = false
+// Устанавливаем конфигурацию для продакшена (по желанию)
+app.config.productionTip = false;
 
-new Vue({
-  store,
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
-
+// Монтируем приложение
+app.mount('#app');

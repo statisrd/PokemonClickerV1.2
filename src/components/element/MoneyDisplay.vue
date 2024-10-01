@@ -1,88 +1,80 @@
 <template>
-    <div>
-      <div class="money-display" v-if="money !== null">
-        <img class="money-display__coin" src="@/assets/Coin.svg" alt="coin">
-        <h2 class="money-display__quantity">{{ money.toFixed(0) }}</h2>
-      </div>
-      <div v-else>
-        Loading...
-      </div>
+  <div>
+    <div class="money-display" v-if="money !== null">
+      <img class="money-display__coin" src="@/assets/Coin.svg" alt="coin">
+      <h2 class="money-display__quantity">{{ Math.round(money) }}</h2>
     </div>
-  </template>
-  
-  <script>
-  import { mapActions, mapGetters } from 'vuex';
-  
-  export default {
-    data() {
-      return {
-        profit: null,
-        intervalId: null,
-      };
-    },
-    methods: {
-      ...mapActions(['addMoney']),
-  
-      async fetchProfit(){
-    const profitCrutch = await this.getPlayerPokemon;
-    for(this.crutch in profitCrutch){
-      console.log("profet",profitCrutch);
-      this.profit += this.crutch.mps;
-    }
-  },
+    <div v-else>
+      Loading...
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useMoneyStore } from '@/store/moneyModule'; // Pinia store
+import { usePlayerPokemonsModule } from '@/store/playerPokemonsModule'; // Для получения Pokemon
+
+export default {
+  setup() {
+    const moneyModule = useMoneyStore();
+    const playerPokemonsModule = usePlayerPokemonsModule();
+
+    // Переменные для управления прибылью и интервалом
+    const profit = ref(0);
+    let intervalId = null;
+
+    // Вычисляемое значение денег из Pinia
+    const money = computed(() => moneyModule.getMoney);
 
 
+    // Функция для запуска цикла добавления денег
+    const startAddingMoney = () => {
+      intervalId = setInterval(() => {
+        if (profit.value > 0) {
+          moneyModule.addMoney(profit.value);
+        }
+      }, 1000);
+    };
 
-    },
-    computed: {
-      ...mapGetters(['totalMps']),
-  
-      money() {
-        return this.$store.getters.getMoney;
+    // Монтируем цикл
+    onMounted(async () => {
+      profit.value = await playerPokemonsModule.totalMps;
+      startAddingMoney();
+    });
+
+    // Очищаем интервал перед уничтожением компонента
+    onBeforeUnmount(() => {
+      if (intervalId) {
+        clearInterval(intervalId);
       }
-    },
-    async created() {
-      console.log("Total MPS:", this.totalMps);
+    });
 
-      this.profit = this.totalMps;
-      console.log("prods", this.profit);
-
-    // GPT сделал  рабочий цикл (хз как работает нужно разобраться)
-    this.intervalId = setInterval(() => {
-      if (this.profit > 0) {
-        this.addMoney(this.profit);
-      }
-    }, 1000);
+    return {
+      money,
+    };
   },
-  beforeDestroy() {
-    // Очищаем интервал, когда компонент уничтожается
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
-  }
-  }
-  </script>
-  
-  
-  <style scoped>
-  .money-display {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .money-display__coin {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .money-display__quantity {
-    font-family: Inter;
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 29.05px;
-    text-align: left;
-    color: var(--Primary, #FFCC01);
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+.money-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.money-display__coin {
+  width: 32px;
+  height: 32px;
+}
+
+.money-display__quantity {
+  font-family: Inter;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 29.05px;
+  text-align: left;
+  color: var(--Primary, #FFCC01);
+}
+</style>

@@ -2,19 +2,19 @@
 <template>
   <div class="dropdown-list">
     <div 
-      v-for="block in DropDownList" 
-      :key="block.id" 
+      v-for="item in DropDownList" 
+      :key="item.id" 
       class="dropdown-list__block"
-      @click="toggleComponent(block.id)">
+      @click="toggleComponent(item.id)">
       <div class="dropdown-list__block-info">
         <div class="dropdown-list__block-info__name">
-          {{ block.name }}
+          {{ item.name }}
         </div>
         <img src="@/assets/Arrow.svg" alt="">
       </div>
       <component 
-        v-if="activeComponent === block.id" 
-        :is="block.elementName">
+        v-if="activeComponent === item.id" 
+        :is="item.elementName">
       </component>
     </div>
   </div>
@@ -22,7 +22,7 @@
 
 <script>
 import { ref,  onMounted } from 'vue';
-import { usePlayerPokemonsModule } from '@/store/playerPokemonsModule';
+import { usePlayerPokemonStore } from '@/store/playerPokemonsModule';
 import PokemonBlock from '@/components/element/PokemonsBlock.vue';
 import GardenBlock from '@/components/element/GardenBlock.vue';
 import HuntBlock from '@/components/element/HuntBlock.vue';
@@ -34,8 +34,7 @@ export default {
     HuntBlock
   },
   setup() {
-    const playerPokemonsModule = usePlayerPokemonsModule();
-
+    const playerPokemonsStore = usePlayerPokemonStore();
     const activeComponent = ref(null);
     const DropDownList = ref([
       { id: 0, name: 'My pokemon', elementName: 'PokemonBlock' },
@@ -44,7 +43,6 @@ export default {
     ]);
 
     const toggleComponent = (id) => {
-      console.log("zakriv")
       if (activeComponent.value !== id) {
         activeComponent.value = id;
       } else {
@@ -53,12 +51,12 @@ export default {
     };
 
     onMounted(async () => {
-      const pokemons = playerPokemonsModule.getPlayerPokemon || [];
-
+      const getPlayerPokemon = await playerPokemonsStore.getPlayerPokemon;
+      const pokemons = await getPlayerPokemon.value || [];
       if (pokemons.length === 0) {
-        await playerPokemonsModule.addNewPokemon(84);
-        await playerPokemonsModule.addNewPokemon(34);
-        await playerPokemonsModule.addNewPokemon(63);
+        await playerPokemonsStore.addNewPokemon({ id: 84 });
+        await playerPokemonsStore.addNewPokemon({ id: 34 });
+        await playerPokemonsStore.addNewPokemon({ id: 63 });
       }
     });
 

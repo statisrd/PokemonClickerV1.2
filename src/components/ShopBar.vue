@@ -16,40 +16,26 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
 import ShopBlock from './ShopBlock.vue';
-
 import PasEgg from '@/components/element/veryImportant/PasEgg.vue';
 import MoneyAdd from '@/components/element/veryImportant/MoneyAdd.vue';
 
-export default {
-  components: {
-    PasEgg,
-    MoneyAdd,
+const isPasEggVisible = ref(false);
+const amount = ref(0);
 
-    ShopBlock,
-  },
-  data() {
-    return {
-      isPasEggVisible: false,
-      amount: 0
-    }
-  },
-  methods: {
-    openPasEgg() {
-      this.isPasEggVisible = true;
-    },
-    closePasEgg() {
-      this.isPasEggVisible = false;
-    }
-  }
-}
+const openPasEgg = () => {
+  isPasEggVisible.value = true;
+};
+
+const closePasEgg = () => {
+  isPasEggVisible.value = false;
+};
 </script>
 
 <style scoped lang="scss">
-
 @import "@/scss/mixins.scss";
-
 
 .shop-item {
   display: flex;
@@ -64,10 +50,9 @@ export default {
   box-shadow: 0px 0px 16px 0px #3A3A3A1A;
   border-radius: 12px;
 
-  &__name{
+  &__name {
     @include yellow-blue-style;
-    margin: 0 ;
+    margin: 0;
   }
-
 }
 </style>

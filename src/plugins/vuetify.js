@@ -1,7 +1,12 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib/framework';
+// src/plugins/vuetify.js
+import { createVuetify } from 'vuetify';
+import 'vuetify/styles'; // Импортируйте стили Vuetify
+import * as components from 'vuetify/components'; // Импортируйте компоненты
+import * as directives from 'vuetify/directives'; // Импортируйте директивы
 
-Vue.use(Vuetify);
-
-export default new Vuetify({
+const vuetify = createVuetify({
+  components,
+  directives,
 });
+
+export default vuetify;

@@ -51,92 +51,101 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { ref, computed, onMounted } from 'vue';
+import { usePokemonStore } from '@/store/pokemonModule';
+import { useMoneyStore } from '@/store/moneyModule';
+import { usePlayerPokemonsModule } from '@/store/playerPokemonsModule';
+
 
 
 export default {
+    name: 'ShopItem',
     props: {
-        pokemon: Object
-    },
-    data() {
-        return {
-            activeTab: 'feed',
-            pokemonNickname: '',
-            foodItems: [],
-            showAlert: false,
-            alertMessage: ''
-        };
-    },
-    methods: {
-        ////разберись V
-        ...mapActions(['renamePokemon', 'removePokemonFromGrid']),
+    pokemon: Object,
+  },
+  setup(props) {
+    const pokemonStore = usePokemonStore();
+    const playerPokemonStore = usePlayerPokemonsModule();
+    const moneyStore = useMoneyStore();
 
-        saveNickname() {
-            console.log(this.pokemon.id);
-            console.log(this.pokemonNickname);
-            this.renamePokemon( {id: this.pokemon.id, newName: this.pokemonNickname});
-        },
-        subtractMoney(price) {
-        this.$store.dispatch('subtractMoney', price);
-      },
-        feedPokemon(item) {
-            this.alertMessage = `Ягод нет! Но деньги мы спишем`;
-            this.showAlert = true;
-            this.subtractMoney(10)
-            setTimeout(() => {
-                this.showAlert = false;
-            }, 3000); // скрыть алерт через 3 секунды
-            this.removePokemonFromGrid({ id: item.id, arrayName: 'inventory' });
+    const activeTab = ref('feed');
+    const pokemonNickname = ref('');
+    const foodItems = ref([]);
+    const showAlert = ref(false);
+    const alertMessage = ref('');
 
-        },
+    const saveNickname = () => {
+      console.log("menztv");
+      playerPokemonStore.renamePokemon({ id: props.pokemon.id, newName: pokemonNickname.value });
+    };
 
-        declension(number, titles) {
-            const cases = [2, 0, 1, 1, 1, 2];
-            return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
-        },
-    },
-    computed:{
-        pokemonAge() {
-            const currentTime = Date.now();
-            const ageInMilliseconds = currentTime - this.pokemon.age;
-            
-            const minutes = Math.floor((ageInMilliseconds / (1000 * 60)) % 60);
-            const hours = Math.floor((ageInMilliseconds / (1000 * 60 * 60)) % 24);
-            const days = Math.floor((ageInMilliseconds / (1000 * 60 * 60 * 24)) % 30);
-            const months = Math.floor((ageInMilliseconds / (1000 * 60 * 60 * 24 * 30)) % 12);
-            const years = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24 * 365));
+    const subtractMoney = (price) => {
+      moneyStore.subtractMoney(price);
+    };
 
-            let ageString = '';
+    const feedPokemon = (item) => {
+      alertMessage.value = `Ягод нет! Но деньги мы спишем`;
+      showAlert.value = true;
+      subtractMoney(10);
+      setTimeout(() => {
+        showAlert.value = false;
+      }, 3000);
+      pokemonStore.removePokemon({ id: item.id, arrayName: 'inventory' });
+    };
 
-            if (years > 0) {
-                ageString += `${years} ${this.declension(years, ['год', 'года', 'лет'])} `;
-            }
-            if (months > 0) {
-                ageString += `${months} ${this.declension(months, ['месяц', 'месяца', 'месяцев'])} `;
-            }
-            if (days > 0) {
-                ageString += `${days} ${this.declension(days, ['день', 'дня', 'дней'])} `;
-            }
-            if (hours > 0) {
-                ageString += `${hours} ${this.declension(hours, ['час', 'часа', 'часов'])} `;
-            }
-            if (minutes > 0 || ageString === '') {
-                ageString += `${minutes} ${this.declension(minutes, ['минута', 'минуты', 'минут'])}`;
-            }
+    const declension = (number, titles) => {
+      const cases = [2, 0, 1, 1, 1, 2];
+      return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+    };
 
-            return ageString.trim();
-        },
+    const pokemonAge = computed(() => {
+      const currentTime = Date.now();
+      const ageInMilliseconds = currentTime - props.pokemon.age;
 
-    ...mapGetters(['getPokemon']),
+      const minutes = Math.floor((ageInMilliseconds / (1000 * 60)) % 60);
+      const hours = Math.floor((ageInMilliseconds / (1000 * 60 * 60)) % 24);
+      const days = Math.floor((ageInMilliseconds / (1000 * 60 * 60 * 24)) % 30);
+      const months = Math.floor((ageInMilliseconds / (1000 * 60 * 60 * 24 * 30)) % 12);
+      const years = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24 * 365));
 
+      let ageString = '';
 
-    },
-    
-    created(){
-        this.foodItems = this.getPokemon;
-    },
-    
+      if (years > 0) {
+        ageString += `${years} ${declension(years, ['год', 'года', 'лет'])} `;
+      }
+      if (months > 0) {
+        ageString += `${months} ${declension(months, ['месяц', 'месяца', 'месяцев'])} `;
+      }
+      if (days > 0) {
+        ageString += `${days} ${declension(days, ['день', 'дня', 'дней'])} `;
+      }
+      if (hours > 0) {
+        ageString += `${hours} ${declension(hours, ['час', 'часа', 'часов'])} `;
+      }
+      if (minutes > 0 || ageString === '') {
+        ageString += `${minutes} ${declension(minutes, ['минута', 'минуты', 'минут'])}`;
+      }
+
+      return ageString.trim();
+    });
+
+    onMounted(() => {
+      foodItems.value = pokemonStore.getPokemon;
+    });
+
+    return {
+      activeTab,
+      pokemonNickname,
+      foodItems,
+      showAlert,
+      alertMessage,
+      saveNickname,
+      feedPokemon,
+      pokemonAge,
+    };
+  },
 };
+
 
 
 </script>

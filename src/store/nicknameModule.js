@@ -1,38 +1,21 @@
-// store/nicknameModule.js  
-const state = {
-    nicknames: JSON.parse(localStorage.getItem('pokemonNicknames')) || {}
-};
+// /src/store/nicknameStore.js
+import { defineStore } from 'pinia';
 
-const mutations = {
-    SET_NICKNAME(state, { pokemonId, nickname }) {
-        state.nicknames = { ...state.nicknames, [pokemonId]: nickname };
-        localStorage.setItem('pokemonNicknames', JSON.stringify(state.nicknames));
+export const useNicknameStore = defineStore('nickname', {
+  state: () => ({
+    nicknames: JSON.parse(localStorage.getItem('pokemonNicknames')) || {},  // Данные для никнеймов покемонов
+  }),
+  actions: {
+    setNickname(pokemonId, nickname) {
+      this.nicknames = { ...this.nicknames, [pokemonId]: nickname };  // Обновляем состояние
+      localStorage.setItem('pokemonNicknames', JSON.stringify(this.nicknames));  // Сохраняем в localStorage
     },
-    REMOVE_NICKNAME(state, pokemonId) {
-        // Использование delete для удаления свойства
-        delete state.nicknames[pokemonId];
-        localStorage.setItem('pokemonNicknames', JSON.stringify(state.nicknames));
+    removeNickname(pokemonId) {
+      delete this.nicknames[pokemonId];  // Удаляем никнейм
+      localStorage.setItem('pokemonNicknames', JSON.stringify(this.nicknames));  // Сохраняем в localStorage
     }
-};
-
-const actions = {
-    setNickname({ commit }, { pokemonId, nickname }) {
-        commit('SET_NICKNAME', { pokemonId, nickname });
-    },
-    removeNickname({ commit }, pokemonId) {
-        commit('REMOVE_NICKNAME', pokemonId);
-    }
-};
-
-const getters = {
-    getNickname: (state) => (pokemonId) => state.nicknames[pokemonId] || ''
-};
-
-export default {
-    namespaced: true,
-    state,
-    mutations,
-    actions,
-    getters
-};
-/////// 
+  },
+  getters: {
+    getNickname: (state) => (pokemonId) => state.nicknames[pokemonId] || ''  // Получаем никнейм по ID покемона
+  }
+});

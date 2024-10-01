@@ -1,7 +1,7 @@
 <template>
     <div class="header-content ">
       <div class="header-content__logo">
-        <img class="header-content__logo-left" src="@/assets/Pokemon.svg" alt="">
+        <img class="header-content__logo-left" src="../assets/Pokemon.svg" alt="">
         <div class="header-content__logo-delimiter"></div>
         <img class="header-content__logo-right" src="@/assets/Clicker.svg" alt="">
       </div>

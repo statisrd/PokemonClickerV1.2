@@ -1,37 +1,29 @@
 // store/moneyModule.js
-export default {
-    state: {
-      money: parseInt(localStorage.getItem('money')) || 0
-    },
-    mutations: {
-      addMoney(state, amount) {
-        if (amount > 0) {
-          state.money += amount;
-          localStorage.setItem('money', state.money);
-        }
-      },
-      subtractMoney(state, amount) {
-        if (amount > 0 && state.money >= amount) {
-          state.money -= amount;
-          localStorage.setItem('money', state.money);
-        }
+import { defineStore } from 'pinia';
+
+export const useMoneyStore = defineStore('money', {
+  state: () => ({
+    money: parseInt(localStorage.getItem('money')) || 0,
+  }),
+  actions: {
+    addMoney(amount) {
+      if (amount > 0) {
+        this.money += amount;
+        localStorage.setItem('money', this.money);
       }
     },
-    actions: {
-      async subtractMoney({ commit }, amount) {
-        if (amount <= 0) {
-          throw new Error('Amount must be positive');
-        }
-        commit('subtractMoney', amount);
-      },
-      async addMoney({ commit }, amount) {
-        commit('addMoney', amount);
-      },
-    },
-    getters: {
-      getMoney(state) {
-        return state.money;
+    subtractMoney(amount) {
+      if (amount > 0 && this.money >= amount) {
+        this.money -= amount;
+        localStorage.setItem('money', this.money);
+      } else {
+        console.error('Insufficient funds or invalid amount');
       }
     }
+  },
+  getters: {
+    getMoney: (state) => state.money,
   }
-  
+});
+
+

@@ -1,17 +1,15 @@
+// /src/store/gdsStore.js
+import { defineStore } from 'pinia';
 import axios from 'axios';
+import { usePokemonStore } from './pokemonModule'; // Убедитесь, что путь правильный
 
-export default {
-  state: {
+
+export const useGdsStore = defineStore('gds', {
+  state: () => ({
     gds: JSON.parse(localStorage.getItem('gds')) || [], // Данные для ягод и покеболов
-  },
-  mutations: {
-    addGDS(state, { id, price, gdsData, name, info, type }) {
-      state.gds.push({ id, price, gdsData, name, info, type });
-      localStorage.setItem('gds', JSON.stringify(state.gds)); // Сохранение в localStorage
-    },
-  },
+  }),
   actions: {
-    async addAGDS({ commit }, { id, price, name, info, type }) {
+    async addAGDS({ id, price, name, info, type }) {
       try {
         let gdsDataResponse;
 
@@ -31,7 +29,7 @@ export default {
         // Используем UUID для генерации уникального ID
         const uniqueId = gdsDataResponse.id + Date.now();
 
-        commit('addGDS', { 
+        this.gds.push({ 
           id: uniqueId,
           gdsData: gdsDataResponse, // Сохранение данных, а не ответа
           price,
@@ -39,28 +37,43 @@ export default {
           info,
           type
         });
+
+        localStorage.setItem('gds', JSON.stringify(this.gds)); // Сохранение в localStorage
       } catch (error) {
         console.error('Error adding new product data:', error);
       }
     },
-    async buyAGDS({ state, dispatch }, id) {
+    async buyAGDS(id) {
+      let resultAdding; // Объявляем переменную заранее
       try {
         // Находим элемент по ID
-        const gdsItem = state.gds.find(item => item.id === id);
-
+        const gdsItem = this.gds.find(item => item.id === id);
+    
         if (!gdsItem) {
           throw new Error(`Item with ID ${id} not found`);
         }
-
+    
         // Извлекаем данные элемента и передаем их в addPokemonToGrid
         const pokemonData = gdsItem.gdsData;
         const arrayName = 'inventory'; // Можно заменить на другое значение, если нужно
-
-        await dispatch('addPokemonToGrid', { pokemonData, arrayName, name: gdsItem.name, info: gdsItem.info, type: gdsItem.type }, { root: true });
-      } catch (error) { 
+    
+        // Предположим, что addPokemonToGrid доступен в другом store, можно импортировать и использовать его
+        const pokemonModule = usePokemonStore();
+    
+        resultAdding = await pokemonModule.addPokemonToGrid({
+          pokemonData,
+          arrayName,
+          name: gdsItem.name,
+          info: gdsItem.info,
+          type: gdsItem.type
+        });
+      } catch (error) {
         console.error('Error buying GDS:', error);
       }
+      
+      return resultAdding; // Возвращаем результат вне блока try-catch
     },
+    
   },
   getters: {
     getShop(state) {
@@ -70,4 +83,4 @@ export default {
       return state.gds.filter(item => item.type === type);
     },
   }
-};
+});

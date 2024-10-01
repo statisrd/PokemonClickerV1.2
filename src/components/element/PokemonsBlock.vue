@@ -3,7 +3,7 @@
     <div v-for="(playerPokemon, index) in playerPokemons" :key="index" class="pokemon-card">
       <div class="pokemon-info">
         <h3>{{ playerPokemon.name }}</h3>
-        <img style="cursor:pointer" src="@/assets/setting.svg" :alt="playerPokemon.name" @click="showModal(playerPokemon)" />
+        <img style="cursor:pointer" src="@/assets/setting.svg" alt="шестерёнка" @click.stop="showModal(playerPokemon)" />
       </div>
       <img :src="playerPokemon.playerPokemon.sprites.front_default" :alt="playerPokemon.name" class="pokemon-info" />
       <div class="pokemon-info">
@@ -18,51 +18,56 @@
 
     <!-- Использование компонента SettingsModal -->
     <SettingsModal
-    v-if="selectedPokemon"
-    :pokemon="selectedPokemon"
-    @close="hideModal"
+      v-if="selectedPokemon"
+      :pokemon="selectedPokemon"
+      @close="hideModal"
     />
-    <!-- Разобраться как эта шляпа работает (@update-nickname="updatePokemonNickname" ) -->
   </div>
 </template>
 
+<!-- <script>
+import { ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import SettingsModal from './SettingsModal.vue'; -->
+
 <script>
-import SettingsModal from './SettingsModal.vue';
-import { mapActions, mapGetters } from 'vuex';
+import SettingsModal from '@/components/element/SettingsModal.vue';
+import { usePlayerPokemonsModule } from '@/store/playerPokemonsModule';
+
+// import { useStore } from 'pinia';
+import { ref, onMounted } from 'vue';
 
 export default {
   components: {
     SettingsModal
   },
-  data() {
-    return {
-      playerPokemons: [], 
-      selectedPokemon: null ,
+  setup() {
+    const playerPokemonsStore = usePlayerPokemonsModule();
+    const playerPokemons = ref([]);
+    const selectedPokemon = ref(null);
+
+
+    const showModal = (pokemon) => {
+      selectedPokemon.value = pokemon;
+      console.log("pokemuuu", selectedPokemon.value);
     };
-  },
-  methods: {
-    ...mapActions(['addNewPokemon','subtractMoney']),
-    showModal(playerPokemon) {
-      this.selectedPokemon = playerPokemon;
-    },
-    hideModal() {
-      this.selectedPokemon = null;
-    },
-  },
-  computed: {
-    ...mapGetters(['getPlayerPokemon']),
 
-  },
+    const hideModal = () => {
 
-  async mounted() {
-    this.playerPokemons = await this.getPlayerPokemon;
+      selectedPokemon.value = null;
+    };
 
+    onMounted(async () => { 
+      playerPokemons.value = playerPokemonsStore.getPlayerPokemon;
+      console.log("pokem", playerPokemons.value);
+    });
 
-
-    this.playerPokemons = await this.getPlayerPokemon;
-    console.log("pokem",this.playerPokemon);
-
-
+    return {
+      playerPokemons,
+      selectedPokemon,
+      showModal,
+      hideModal,
+    };
   },
 };
 </script>
@@ -76,10 +81,6 @@ export default {
   overflow-y: auto; 
   height: 500px; 
 }
-
-
-
-
 
 .pokemon-card {
   display: flex;

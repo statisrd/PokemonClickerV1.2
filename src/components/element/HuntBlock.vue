@@ -1,21 +1,23 @@
 <template>
   <div class="container">
-    У тебя нет лицензии
+    <div class="matrix">
+      <div v-for="(row, rowIndex) in matrix" :key="rowIndex" class="row">
+        <div v-for="(cell, colIndex) in row" :key="colIndex" class="cell">
+          <img v-if="cell" :src="cell.sprites.front_default" :alt="cell.name" class="pokemon-image" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-
+import { ref, onMounted } from 'vue';
 
 export default {
+  setup() {
+    const matrix = ref([]);
 
-  data() {
-    return {
-      matrix: []
-    };
-  },
-  methods: {
-    async fetchItem() {
+    const fetchItem = async () => {
       const pokemonIds = [1, 2, 3, 4, 5, 6, 7]; // Можно указать больше ID покемонов
       const requests = pokemonIds.map(id => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(response => response.json()));
       const pokemons = await Promise.all(requests);
@@ -29,15 +31,22 @@ export default {
         matrix[row][col] = pokemon;
       });
 
-      this.matrix = matrix;
-    },
-    onDragEnd() {
+      matrix.value = matrix;
+    };
+
+    const onDragEnd = () => {
       // Обработка окончания перетаскивания (если нужно)
-    }
+    };
+
+    onMounted(() => {
+      fetchItem();
+    });
+
+    return {
+      matrix,
+      onDragEnd,
+    };
   },
-  mounted() {
-    this.fetchItem();
-  }
 };
 </script>
 
@@ -50,7 +59,7 @@ export default {
 
 .matrix {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, 80px);
   gap: 10px;
 }
 
@@ -66,5 +75,10 @@ export default {
   align-items: center;
   justify-content: center;
   background-color: #f9f9f9;
+}
+
+.pokemon-image {
+  width: 100%;
+  height: auto;
 }
 </style>
