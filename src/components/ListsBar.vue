@@ -10,7 +10,7 @@
         <div class="dropdown-list__block-info__name">
           {{ block.name }}
         </div>
-        <img src="@/assets/Arrow.svg" alt="">
+        <img src="Arrow.svg" alt="">
       </div>
       <component 
         v-if="activeComponent === block.id" 

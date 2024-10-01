@@ -3,7 +3,7 @@
     <div v-for="(playerPokemon, index) in playerPokemons" :key="index" class="pokemon-card">
       <div class="pokemon-info">
         <h3>{{ playerPokemon.name }}</h3>
-        <img style="cursor:pointer" src="@/assets/setting.svg" alt="шестерёнка" @click.stop="showModal(playerPokemon)" />
+        <img style="cursor:pointer" src="setting.svg" alt="шестерёнка" @click.stop="showModal(playerPokemon)" />
       </div>
       <img :src="playerPokemon.playerPokemon.sprites.front_default" :alt="playerPokemon.name" class="pokemon-info" />
       <div class="pokemon-info">

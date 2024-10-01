@@ -1,6 +1,6 @@
 <template>
   <div class="money-display" @click="handleClick">
-    <img class="money-display__coin" src="@/assets/Coin.svg" alt="coin">
+    <img class="money-display__coin" src="Coin.svg" alt="coin">
     <h2 class="money-display__quantity">{{ amount }}</h2>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <div class="shop-block">
-      <img class="shop-block__search" src="@/assets/Search.svg" alt="search">
+      <img class="shop-block__search" src="Search.svg" alt="search">
       <div class="shop-block__assortiment" v-for="elem in shopAssortment" :key="elem.id">
         <ShopItem :elem="elem" />
       </div>

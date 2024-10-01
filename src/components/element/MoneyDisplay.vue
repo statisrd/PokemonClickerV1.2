@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="money-display" v-if="money !== null">
-      <img class="money-display__coin" src="@/assets/Coin.svg" alt="coin">
+      <img class="money-display__coin" src="Coin.svg" alt="coin">
       <h2 class="money-display__quantity">{{ Math.round(money) }}</h2>
     </div>
     <div v-else>
